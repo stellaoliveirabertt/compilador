@@ -1,37 +1,19 @@
-## Welcome to GitHub Pages
+# Trabalho Prático de Compiladores
 
-You can use the [editor on GitHub](https://github.com/stellaoliveirabertt/compilador/edit/master/README.md) to maintain and preview the content for your website in Markdown files.
+Esse repositorio, se trata do desenvolvimento de um compilador na linguagem "C#"
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+Um compilador é um programa que a partir de um código fonte escrito em uma linguagem compilada, é criado um programa semanticamente equivalente, porém escrito em outra linguagem. De forma geral, um compilador traduz um programa de uma linguagemm que uma pessoa seja capaz de entender.
 
-### Markdown
+## 1º Parte 
+### Analise Léxica:
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+É um processo de analise de entrada de linhas de caracteres (código fonte) que produz uma sequência de sómbolos (símbolos léxicos), que podem ser manipulados mais facilmente por um parser (leitor de saída).
+A Análise léxica verifica o alfabeto a partir de uma tabela de símbolos, se existe ou não algum caracter que faz parte dessa tabela.
 
-```markdown
-Syntax highlighted code block
+1. **Parte da análise léxica:**
+A entrada é lida, uma de cada vez, mudando o estado em que os caracteres se encontram. Quando o analisador encontra um caracter que ele não identifica como correto, ele chama o "estado morto" logo, volta a última analise aceita e tem o tipo de comprimento do léxico válido.
 
-# Header 1
-## Header 2
-### Header 3
+2. **1º Parte da análise léxica:**
+Os caracteres são repassados do léxico para produzir um valor, o tipo do léxico combinado com seu valor é o adequado, o que pode ser dado um parser.
 
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
-```
-
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/stellaoliveirabertt/compilador/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+Para mais explicações [Análise Léxica](https://pt.wikipedia.org/wiki/An%C3%A1lise_l%C3%A9xica).
