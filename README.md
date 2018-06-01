@@ -1,7 +1,5 @@
 # Trabalho Prático de Compiladores
 
-Esse repositorio, se trata do desenvolvimento de um compilador na linguagem "C#"
-
 Um compilador é um programa que a partir de um código fonte escrito em uma linguagem compilada, é criado um programa semanticamente equivalente, porém escrito em outra linguagem. De forma geral, um compilador traduz um programa de uma linguagemm que uma pessoa seja capaz de entender.
 
 ## 1º Parte 
