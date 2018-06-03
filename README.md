@@ -16,7 +16,7 @@ Para mais explicações [Análise Léxica](https://pt.wikipedia.org/wiki/An%C3%A
 
 
 ## 2º Parte
-### Analisador Sintático:
+### Analisador Sintático (Neste trabalho foi implementado o Top-Down):
 
 É o processo de se determinar se uma cadeia de simbolos léxicos pode ser gerada por uma gramática. Ela transforma um texto na entrada em uma estrutura de dados, em geral uma árvore, o que é conveniente para o processamento posterior e captura a hierarquia implicita desta entrada. Através da análise léxica é obtido um grupo de tokens, para que o analisador sintático use um conjunto de regras para constuir uma árvore sintática da estrutura.
 
