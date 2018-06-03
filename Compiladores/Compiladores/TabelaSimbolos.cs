@@ -6,44 +6,44 @@ namespace Compiladores
     {
         private Dictionary<Token, InfIdentificador> tabelaSimbolos;
 
-        public TabelaSimbolos()
+        public TabelaSimbolos(int linha, int coluna)
         {
             tabelaSimbolos = new Dictionary<Token, InfIdentificador>();
 
             #region Palavras reservadas
             Token palavra;
 
-            palavra = new Token(EnumTab.KW_PROGRAM, "program", 0, 0);
+            palavra = new Token(EnumTab.KW_PROGRAM, "program", linha, coluna);
             tabelaSimbolos[palavra] = new InfIdentificador();
 
-            palavra = new Token(EnumTab.KW_IF, "if", 0, 0);
+            palavra = new Token(EnumTab.KW_IF, "if", linha, coluna);
             tabelaSimbolos[palavra] = new InfIdentificador();
 
-            palavra = new Token(EnumTab.KW_ELSE, "else", 0, 0);
+            palavra = new Token(EnumTab.KW_ELSE, "else", linha, coluna);
             tabelaSimbolos[palavra] = new InfIdentificador();
 
-            palavra = new Token(EnumTab.KW_WHILE, "while", 0, 0);
+            palavra = new Token(EnumTab.KW_WHILE, "while", linha, coluna);
             tabelaSimbolos[palavra] = new InfIdentificador();
 
-            palavra = new Token(EnumTab.KW_WRITE, "write", 0, 0);
+            palavra = new Token(EnumTab.KW_WRITE, "write", linha, coluna);
             tabelaSimbolos[palavra] = new InfIdentificador();
 
-            palavra = new Token(EnumTab.KW_READ, "read", 0, 0);
+            palavra = new Token(EnumTab.KW_READ, "read", linha, coluna);
             tabelaSimbolos[palavra] = new InfIdentificador();
 
-            palavra = new Token(EnumTab.KW_NUM, "num", 0, 0);
+            palavra = new Token(EnumTab.KW_NUM, "num", linha, coluna);
             tabelaSimbolos[palavra] = new InfIdentificador();
 
-            palavra = new Token(EnumTab.KW_CHAR, "char", 0, 0);
+            palavra = new Token(EnumTab.KW_CHAR, "char", linha, coluna);
             tabelaSimbolos[palavra] = new InfIdentificador();
 
-            palavra = new Token(EnumTab.KW_NOT, "not", 0, 0);
+            palavra = new Token(EnumTab.KW_NOT, "not", linha, coluna);
             tabelaSimbolos[palavra] = new InfIdentificador();
 
-            palavra = new Token(EnumTab.KW_OR, "or", 0, 0);
+            palavra = new Token(EnumTab.KW_OR, "or", linha, coluna);
             tabelaSimbolos[palavra] = new InfIdentificador();
 
-            palavra = new Token(EnumTab.KW_AND, "and", 0, 0);
+            palavra = new Token(EnumTab.KW_AND, "and", linha, coluna);
             tabelaSimbolos[palavra] = new InfIdentificador();
             #endregion
         }
@@ -83,11 +83,10 @@ namespace Compiladores
         public override string ToString()
         {
             string mensagemSaida = " ";
-            int posicao = 1;
 
             foreach (Token token in tabelaSimbolos.Keys)
             {
-                mensagemSaida += (("Posição: " + posicao + ": \t " + token.ToString()) + "\n");
+                mensagemSaida += (("\t " + token.ToString()) + "\n");
             }
 
             return mensagemSaida;

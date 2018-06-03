@@ -6,10 +6,14 @@ namespace Compiladores
     {
         public static void Main(string[] args)
         {
-            AnalisadorLex lexer = new AnalisadorLex("teste.txt");
-            AnalisadorSint sintatico = new AnalisadorSint(lexer);
-            
+            AnalisadorLex lexico = new AnalisadorLex("teste.txt");
+            AnalisadorSint sintatico = new AnalisadorSint(lexico);
 
+            //Inicia o processo
+            sintatico.prog();
+            sintatico.fecharArquivo();
+
+           // lexico.imprimeTabelaSimbolos();
             #region Versão 01
             //Token token;
             //TabelaSimbolos tabelaSimbolos = new TabelaSimbolos();

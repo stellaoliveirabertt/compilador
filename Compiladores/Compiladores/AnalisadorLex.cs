@@ -19,7 +19,7 @@ namespace Compiladores
         #region Leitura de Arquivo
         public AnalisadorLex(String arquivoEntrada)
         {
-            tabelaSimbolos = new TabelaSimbolos();
+            tabelaSimbolos = new TabelaSimbolos(nLinhas, nColunas);
             try
             {
                 arquivo = new FileStream("C:\\Users\\stell\\Documents\\Arquivos\\teste.txt", FileMode.Open);
@@ -37,6 +37,14 @@ namespace Compiladores
             }
         }
         #endregion
+
+        public void imprimeTabelaSimbolos()
+        {
+            Console.WriteLine("\n");
+            Console.WriteLine("\t\t    Tabela de Simbolos: \n\n");
+            Console.WriteLine(tabelaSimbolos.ToString());
+            Console.WriteLine("\n");
+        }
 
         #region Fechar Arquivo
         public void fechaArquivo()
@@ -213,7 +221,7 @@ namespace Compiladores
                         else if (caracter == '{')
                         {
                             estado = 24;
-                            return new Token(EnumTab.SMB_CPA, "{", nLinhas, nColunas);
+                            return new Token(EnumTab.SMB_OBC, "{", nLinhas, nColunas);
                         }
                         else if (caracter == '}')
                         {
