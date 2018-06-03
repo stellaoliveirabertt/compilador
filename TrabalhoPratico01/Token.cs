@@ -1,19 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace TrabalhoPratico01
+namespace Compiladores
 {
     public class Token
     {
+        #region Variaveis
         private string lexema;
         private EnumTab classe;
         public int nLinha;
-        public int nColuna;       
+        public int nColuna;
+        #endregion
 
-        //Construtor
+        #region Construtor
         public Token(EnumTab classe, String lexema, int linha, int Coluna)
         {
             this.classe = classe;
@@ -21,7 +19,9 @@ namespace TrabalhoPratico01
             this.nLinha = linha;
             this.nColuna = Coluna;
         }
+        #endregion
 
+        #region Métodos Get/Set
         public String getLexema()
         {
 
@@ -35,7 +35,6 @@ namespace TrabalhoPratico01
         }
         public EnumTab getClasse()
         {
-
             return classe;
         }
 
@@ -64,10 +63,16 @@ namespace TrabalhoPratico01
         {
             this.nColuna = coluna;
         }
+        #endregion
 
         public override string ToString()
         {
-            return "<" + classe + " , \"" + lexema + " \">\nLinha: " + getLinha() + " \tColuna: " + getColuna();
+            return "<" + classe + " , \"" + lexema + " \">";
+        }
+
+        public string LinhaPercorrida()
+        {
+            return "\tLinha: " + getLinha() + " Coluna: " + getColuna();
         }
     }
 }

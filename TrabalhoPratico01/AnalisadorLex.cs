@@ -2,29 +2,27 @@
 using System.IO;
 using System.Text;
 
-namespace TrabalhoPratico01
+namespace Compiladores
 {
     public class AnalisadorLex
     {
         #region Variaveis
-        private static readonly int END_OF_FILE = -1; //Fim de arquivo 
-        private static int lookahead = 0; //Armazena o último caracter lido
-        public static int nLinhas = 1; //Contador de Linhas
-        public static int nColunas = 1; // " de colunas
-        private FileStream arquivo; //Referencia para o arquivo
-        private TabelaSimbolos tabelaSimbolos; //Tabela de Simbolos      
+        private static readonly int END_OF_FILE = -1;
+        private static int lookahead = 0;
+        public static int nLinhas = 1;
+        public static int nColunas = 1;
+        private FileStream arquivo;
+        private TabelaSimbolos tabelaSimbolos;
 
         #endregion
 
-        // Construtor abre o arquivo de: xxxxx e verifica
+        #region Leitura de Arquivo
         public AnalisadorLex(String arquivoEntrada)
         {
-            tabelaSimbolos = new TabelaSimbolos();
+            tabelaSimbolos = new TabelaSimbolos(nLinhas, nColunas);
             try
             {
-                #region Leitura de Arquivo
-                arquivo = new FileStream("E:\\StellaOliveiraMoreira\\TrabalhoPratico01\\Arquivos_Teste\\Teste01.txt", FileMode.Open);
-                #endregion
+                arquivo = new FileStream("C:\\Users\\stell\\Documents\\Arquivos\\teste.txt", FileMode.Open);
             }
             catch (IOException excep)
             {
@@ -38,8 +36,17 @@ namespace TrabalhoPratico01
                 Environment.Exit(2);
             }
         }
+        #endregion
 
-        //Fecha o arquivo aberto
+        public void imprimeTabelaSimbolos()
+        {
+            Console.WriteLine("\n");
+            Console.WriteLine("\t\t    Tabela de Simbolos: \n\n");
+            Console.WriteLine(tabelaSimbolos.ToString());
+            Console.WriteLine("\n");
+        }
+
+        #region Fechar Arquivo
         public void fechaArquivo()
         {
             try
@@ -53,8 +60,9 @@ namespace TrabalhoPratico01
                 Console.ReadLine();
             }
         }
+        #endregion
 
-        //Sinaliza erro do token
+        #region Sinaliza Erro Léxico
         public void sinalizaErro(String mensagem)
         {
             Console.WriteLine("\n\tErro Lexico: " + mensagem + "\n");
@@ -62,8 +70,9 @@ namespace TrabalhoPratico01
             Console.WriteLine("\n\n\t\tArquivo Finalizado");
             Console.ReadLine();
         }
+        #endregion
 
-        //Retorna uma posição do buffer de leitura
+        #region Retorna uma posição
         public void retornaPonteiro()
         {
             try
@@ -82,15 +91,18 @@ namespace TrabalhoPratico01
                 Console.ReadLine();
             }
         }
+        #endregion
 
-        //Obtem o próximo token
-
+        #region Percorre os Tokens
         public Token proximoToken()
         {
+            #region Variaveis do Método
             var lexema = new StringBuilder();
             int estado = 1;
             char caracter;
+            #endregion
 
+            #region Percorrendo o Arquivo
             for (var i = 0; i <= arquivo.Length; i++)
             {
                 caracter = '\u0000'; //Caracter Null
@@ -110,10 +122,11 @@ namespace TrabalhoPratico01
                     Environment.Exit(3);
                     Console.ReadLine();
                 }
-                #region Analise de Token
-                //Inicia a movimentação do automato            
+                #endregion
+
                 switch (estado)
                 {
+                    #region Case 1
                     case 1:
                         if (lookahead == END_OF_FILE)
                             return new Token(EnumTab.EOF, "EOF", nLinhas, nColunas);
@@ -208,7 +221,7 @@ namespace TrabalhoPratico01
                         else if (caracter == '{')
                         {
                             estado = 24;
-                            return new Token(EnumTab.SMB_CPA, "{", nLinhas, nColunas);
+                            return new Token(EnumTab.SMB_OBC, "{", nLinhas, nColunas);
                         }
                         else if (caracter == '}')
                         {
@@ -224,6 +237,9 @@ namespace TrabalhoPratico01
                             sinalizaErro("\n-------------------------\nErro: Caracter ínvalido " + caracter + " cuja linha é: " + nLinhas + " e a coluna é: " + nColunas);
                         }
                         break;
+                    #endregion
+
+                    #region Case 2
                     case 2:
                         if (caracter == '=')
                         {
@@ -235,6 +251,9 @@ namespace TrabalhoPratico01
                             retornaPonteiro();
                             return new Token(EnumTab.OP_ASS, "=", nLinhas, nColunas);
                         }
+                    #endregion
+
+                    #region Case 4
                     case 4:
                         if (caracter == '=')
                         {
@@ -247,6 +266,9 @@ namespace TrabalhoPratico01
                             sinalizaErro("\n-------------------------\nErro: Token incompleto para o caracter: " + caracter + " cuja linha é: " + nLinhas + " e a coluna é: " + nColunas);
                         }
                         break;
+                    #endregion
+
+                    #region Case 6
                     case 6:
                         if (caracter == '=')
                         {
@@ -259,6 +281,9 @@ namespace TrabalhoPratico01
                             retornaPonteiro();
                             return new Token(EnumTab.OP_LT, "<", nLinhas, nColunas);
                         }
+                    #endregion
+
+                    #region Case 9
                     case 9:
                         if (caracter == '=')
                         {
@@ -271,6 +296,9 @@ namespace TrabalhoPratico01
                             retornaPonteiro();
                             return new Token(EnumTab.OP_GT, ">", nLinhas, nColunas);
                         }
+                    #endregion
+
+                    #region Case 12
                     case 12:
                         if (Char.IsDigit(caracter))
                         {
@@ -288,6 +316,9 @@ namespace TrabalhoPratico01
                             return new Token(EnumTab.NUM_CONST, lexema.ToString(), nLinhas, nColunas);
                         }
                         break;
+                    #endregion
+
+                    #region Case 14
                     case 14:
                         if (Char.IsLetterOrDigit(caracter) || caracter == '_')
                         {
@@ -306,6 +337,9 @@ namespace TrabalhoPratico01
                             return token;
                         }
                         break;
+                    #endregion
+
+                    #region Case 16
                     case 16:
                         if (caracter == '/')
                         {
@@ -325,18 +359,30 @@ namespace TrabalhoPratico01
                             return new Token(EnumTab.OP_DIV, "/", nLinhas, nColunas);
                         }
                         break;
+                    #endregion
+
+                    #region Case 17
                     case 17:
                         estado = 30;
                         break;
+                    #endregion
+
+                    #region Case 18
                     case 18:
                         estado = 31;
                         break;
+                    #endregion
+
+                    #region Case 21
                     case 21:
                         if (caracter == '\n' || lookahead == END_OF_FILE)
                         {
                             return null;
                         }
                         break;
+                    #endregion
+
+                    #region Case 22
                     case 22:
                         if (lookahead == END_OF_FILE)
                         {
@@ -347,6 +393,9 @@ namespace TrabalhoPratico01
                             lexema.Append(caracter);
                         }
                         break;
+                    #endregion
+
+                    #region Case 24
                     case 24:
                         if (lookahead == END_OF_FILE)
                         {
@@ -357,6 +406,9 @@ namespace TrabalhoPratico01
                             lexema.Append(caracter);
                         }
                         break;
+                    #endregion
+
+                    #region Case 26
                     case 26:
                         if (caracter == '\0' || lookahead == END_OF_FILE || caracter == '\n')
                         {
@@ -371,6 +423,9 @@ namespace TrabalhoPratico01
                             lexema.Append(caracter);
                         }
                         break;
+                    #endregion
+
+                    #region Case 27
                     case 27:
                         if (caracter == '"')
                         {
@@ -386,6 +441,9 @@ namespace TrabalhoPratico01
                             lexema.Append(caracter);
                         }
                         break;
+                    #endregion
+
+                    #region Case 28
                     case 28:
                         if (Char.IsDigit(caracter))
                         {
@@ -397,6 +455,9 @@ namespace TrabalhoPratico01
                             sinalizaErro("\n-------------------------\nErro: Padrão DOUBLE inválido na linha: " + nLinhas + " e na coluna: " + nColunas);
                         }
                         break;
+                    #endregion
+
+                    #region Case 29
                     case 29:
                         if (Char.IsDigit(caracter))
                         {
@@ -408,12 +469,18 @@ namespace TrabalhoPratico01
                             return new Token(EnumTab.NUM_CONST, lexema.ToString(), nLinhas, nColunas);
                         }
                         break;
+                    #endregion
+
+                    #region Case 30
                     case 30:
                         if (caracter == '\n' || lookahead == END_OF_FILE)
                         {
                             return null;
                         }
                         break;
+                    #endregion
+
+                    #region Case 31
                     case 31:
                         if (caracter == '\0' || lookahead == END_OF_FILE)
                         {
@@ -428,8 +495,11 @@ namespace TrabalhoPratico01
                             estado = 33;
                         }
                         break;
+                    #endregion
+
+                    #region Case 32
                     case 32:
-                        if(caracter == '/')
+                        if (caracter == '/')
                         {
                             break;
                         }
@@ -438,6 +508,9 @@ namespace TrabalhoPratico01
                             sinalizaErro("\n-------------------------\nErro: Comentário deve ser fechada com */ antes do fim de arquivo");
                         }
                         break;
+                    #endregion
+
+                    #region Case 33
                     case 33:
                         if (caracter == '*')
                         {
@@ -452,8 +525,11 @@ namespace TrabalhoPratico01
                             estado = 33;
                         }
                         break;
+                    #endregion
+
+                    #region Case 34
                     case 34:
-                        if(caracter == '/')
+                        if (caracter == '/')
                         {
                             return null;
                         }
@@ -462,34 +538,11 @@ namespace TrabalhoPratico01
                             sinalizaErro("\n-------------------------\nErro: Comentário deve ser fechada com */ antes do fim de arquivo");
                         }
                         break;
+                        #endregion
                 }
             }
             return null;
         }
         #endregion
-
-        public static void Main(string[] args)
-        {
-            //Parametro de arquivo
-            AnalisadorLex lexer = new AnalisadorLex("Teste01.txt");
-            Token token;
-            TabelaSimbolos tabelaSimbolos = new TabelaSimbolos();
-
-            //Enquanto não houver erros e nem for fim de arquivo:
-            do
-            {
-                token = lexer.proximoToken();
-
-                //Imprime o Token
-                if (token != null)
-                {
-                    Console.WriteLine("-------------------------\n" +
-                                       "Token: " + token.ToString());
-                }
-            } while (lookahead != END_OF_FILE);
-            lexer.fechaArquivo();
-            Console.WriteLine("\n\n\t\tArquivo Finalizado");
-            Console.ReadLine();
-        }
     }
 }

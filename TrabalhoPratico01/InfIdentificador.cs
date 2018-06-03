@@ -1,4 +1,4 @@
-﻿namespace TrabalhoPratico01
+﻿namespace Compiladores
 {
     public class InfIdentificador
     {
