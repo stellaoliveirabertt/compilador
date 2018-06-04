@@ -1,7 +1,7 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
-namespace Compiladores
+namespace TrabalhoPratico_entrega2
 {
     public class AnalisadorSint
     {
@@ -16,6 +16,15 @@ namespace Compiladores
             this.lexer = lexer;
             token = lexer.proximoToken();
             sincroniza = new List<EnumTab>();
+            if (token.getClasse() == EnumTab.COMENTARIO)
+            {
+                proximoToken();
+            }else if (!eat(EnumTab.KW_PROGRAM))
+            {
+                erroSintatico("Esperado \"PROGRAM\", encontrado: " + token.getLexema());
+                sincroniza.Add(EnumTab.STRING);
+                sincronizaToken("[MODO PÂNICO] Esperado \"EOF\", encontrado: " + token.getLexema());
+            }
         }
 
         public void fecharArquivo()
@@ -25,7 +34,7 @@ namespace Compiladores
 
         public void erroSintatico(String mensagem)
         {
-            Console.WriteLine("[ERRO SINTATICO]: " + token.LinhaPercorrida());
+            Console.WriteLine("\n[ERRO SINTATICO]: " + token.LinhaPercorrida());
             Console.WriteLine(mensagem + "\n");
         }
 
@@ -83,6 +92,11 @@ namespace Compiladores
             {
                 program();
             }
+            proximoToken();
+            if (!eat(EnumTab.ID))
+            {
+                body();
+            }
         }
 
         public void program()
@@ -110,15 +124,7 @@ namespace Compiladores
             if (token.getClasse() == EnumTab.KW_NUM || token.getClasse() == EnumTab.KW_CHAR || token.getClasse() == EnumTab.SMB_OBC)
             {
                 decl_list();
-                if (!eat(EnumTab.SMB_OBC))
-                {
-                    erroSintatico("Esperado: \"{\", encontrado: " + token.getLexema());
-                }
                 stmtList();
-                if (!eat(EnumTab.SMB_CBC))
-                {
-                    erroSintatico("Esperado: \"}\", encontrado: " + token.getLexema());
-                }
             }
             else
             {
@@ -233,11 +239,11 @@ namespace Compiladores
                 token.getClasse() == EnumTab.KW_WRITE)
             {
                 stmt();
+                stmtList();
                 if (!eat(EnumTab.SMB_SEM))
                 {
                     erroSintatico("Esperado \";\", encontrado: " + token.getLexema());
                 }
-                stmtList();
             }
             else if (token.getClasse() == EnumTab.SMB_CBC)
             {
@@ -315,23 +321,29 @@ namespace Compiladores
         {
             if (eat(EnumTab.KW_IF))
             {
-                if (!eat(EnumTab.SMB_OPA))
+                if (token.getClasse() == EnumTab.SMB_OPA || token.getClasse() == EnumTab.SMB_CPA)
                 {
-                    erroSintatico("Esperado \"(\", encontrado: " + token.getLexema());
+                    if (!eat(EnumTab.SMB_OPA))
+                    {
+                        erroSintatico("Esperado \"(\", encontrado: " + token.getLexema());
+                    }
+                    condition();
+                    if (!eat(EnumTab.SMB_CPA))
+                    {
+                        erroSintatico("Esperado \")\", encontrado: " + token.getLexema());
+                    }
                 }
-                condition();
-                if (!eat(EnumTab.SMB_CPA))
+                if (token.getClasse() == EnumTab.SMB_OBC || token.getClasse() == EnumTab.SMB_CBC)
                 {
-                    erroSintatico("Esperado \")\", encontrado: " + token.getLexema());
-                }
-                if (!eat(EnumTab.SMB_OBC))
-                {
-                    erroSintatico("Esperado \"{\", encontrado: " + token.getLexema());
-                }
-                stmtList();
-                if (!eat(EnumTab.SMB_CBC))
-                {
-                    erroSintatico("Esperado \"}\", encontrado: " + token.getLexema());
+                    if (!eat(EnumTab.SMB_OBC))
+                    {
+                        erroSintatico("Esperado \"{\", encontrado: " + token.getLexema());
+                    }
+                    stmtList();
+                    if (!eat(EnumTab.SMB_CBC))
+                    {
+                        erroSintatico("Esperado \"}\", encontrado: " + token.getLexema());
+                    }
                 }
                 ifStmtLinha();
             }
@@ -488,6 +500,10 @@ namespace Compiladores
             {
                 simpleExpr();
             }
+            else if (token.getClasse() == EnumTab.STRING)
+            {
+                proximoToken();
+            }
             else
             {
                 erroSintatico("Esperado \"ID ou NUM_CONST ou CHAR_CONST ou ) ou NOT\", encontrado: " + token.getLexema());
@@ -529,7 +545,6 @@ namespace Compiladores
             }
             else
             {
-                erroSintatico("Esperado \"== ou > ou >= ou < ou <= ou !=\", encontrado: " + token.getLexema());
                 //FOLLOW expresionLinha()
                 sincroniza.Add(EnumTab.SMB_CPA);
                 sincronizaToken("[MODO PÂNICO] Esperado: \")\", encontrado: " + token.getLexema());
@@ -546,19 +561,27 @@ namespace Compiladores
                 token.getClasse() == EnumTab.SMB_OPA || token.getClasse() == EnumTab.KW_NOT)
             {
                 term();
-                simpleExprLinha();
+                if (token.getClasse() == EnumTab.SMB_CPA)
+                {
+                    proximoToken();
+                }
+                else
+                    simpleExprLinha();
             }
-            else erroSintatico("Esperado \"ID ou NUM_CONST ou CHAR_CONST ou ( ou NOT\", encontrado: " + token.getLexema());
-            //FOLLOW SIMPLEEXPR()
-            sincroniza.Add(EnumTab.SMB_SEM);
-            sincroniza.Add(EnumTab.OP_EQ);
-            sincroniza.Add(EnumTab.OP_GT);
-            sincroniza.Add(EnumTab.OP_GE);
-            sincroniza.Add(EnumTab.OP_LT);
-            sincroniza.Add(EnumTab.OP_LE);
-            sincroniza.Add(EnumTab.OP_NE);
-            sincroniza.Add(EnumTab.SMB_CPA);
-            sincronizaToken("[MODO PÂNICO] Esperado \"; ou == ou > ou >= ou < ou <= ou != ou )\", encontrado: " + token.getLexema());
+            else
+            {
+                erroSintatico("Esperado \"ID ou NUM_CONST ou CHAR_CONST ou ( ou NOT\", encontrado: " + token.getLexema());
+                //FOLLOW SIMPLEEXPR()
+                sincroniza.Add(EnumTab.SMB_SEM);
+                sincroniza.Add(EnumTab.OP_EQ);
+                sincroniza.Add(EnumTab.OP_GT);
+                sincroniza.Add(EnumTab.OP_GE);
+                sincroniza.Add(EnumTab.OP_LT);
+                sincroniza.Add(EnumTab.OP_LE);
+                sincroniza.Add(EnumTab.OP_NE);
+                sincroniza.Add(EnumTab.SMB_CPA);
+                sincronizaToken("[MODO PÂNICO] Esperado \"; ou == ou > ou >= ou < ou <= ou != ou )\", encontrado: " + token.getLexema());
+            }
         }
 
 
@@ -576,6 +599,10 @@ namespace Compiladores
                 token.getClasse() == EnumTab.OP_LT || token.getClasse() == EnumTab.OP_LE ||
                 token.getClasse() == EnumTab.OP_GT || token.getClasse() == EnumTab.OP_GE ||
                 token.getClasse() == EnumTab.OP_NE || token.getClasse() == EnumTab.SMB_CPA)
+            {
+                proximoToken();
+            }
+            else if (token.getClasse() == EnumTab.NUM_CONST)
             {
                 proximoToken();
             }
@@ -851,14 +878,16 @@ namespace Compiladores
         //constant -> “num_const”, “char_const” |Fol| “*”, “/”, “and”, “+”, “-”, “or”, “;”, “==”, “>”, “>=”, “<”, “<=”, “! =”, “)”
         public void constant()
         {
-            if (!eat(EnumTab.NUM_CONST))
+            if (token.getClasse() == EnumTab.NUM_CONST || token.getClasse() == EnumTab.CHAR_CONST)
             {
-                erroSintatico("Esperado \"NUM_CONST\" encontrado: " + token.getLexema());
-            }
-
-            if (!eat(EnumTab.CHAR_CONST))
-            {
-                erroSintatico("Esperado \"CHAR_CONST\" encontrado: " + token.getLexema());
+                if (token.getClasse() == EnumTab.NUM_CONST)
+                {
+                    proximoToken();
+                }
+                else if (token.getClasse() == EnumTab.NUM_CONST)
+                {
+                    proximoToken();
+                }
             }
             else
             {
@@ -879,7 +908,6 @@ namespace Compiladores
                 sincroniza.Add(EnumTab.OP_NE);
                 sincroniza.Add(EnumTab.SMB_CPA);
                 sincronizaToken("[MODO PÂNICO] Esperado \"* ou / ou AND ou + ou - ou OR ou ; ou == ou > ou >= ou < ou <= ou != ou ),\" encontrado: " + token.getLexema());
-
             }
         }
         #endregion

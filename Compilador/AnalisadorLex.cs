@@ -2,7 +2,7 @@
 using System.IO;
 using System.Text;
 
-namespace Compiladores
+namespace TrabalhoPratico_entrega2
 {
     public class AnalisadorLex
     {
@@ -412,7 +412,7 @@ namespace Compiladores
                     case 26:
                         if (caracter == '\0' || lookahead == END_OF_FILE || caracter == '\n')
                         {
-                            sinalizaErro("\n-------------------------\nErro: String deve ser fechada com \" antes do fim de arquivo");
+                            sinalizaErro("\n");
                         }
                         else if (caracter == '"')
                         {
@@ -473,9 +473,9 @@ namespace Compiladores
 
                     #region Case 30
                     case 30:
-                        if (caracter == '\n' || lookahead == END_OF_FILE)
+                        if (caracter == '\n' || lookahead == END_OF_FILE )
                         {
-                            return null;
+                            return new Token(EnumTab.COMENTARIO, caracter.ToString(), nLinhas, nColunas);
                         }
                         break;
                     #endregion

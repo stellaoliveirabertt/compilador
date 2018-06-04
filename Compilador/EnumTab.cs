@@ -1,4 +1,4 @@
-﻿namespace Compiladores
+﻿namespace TrabalhoPratico_entrega2
 {
     public enum EnumTab
     {

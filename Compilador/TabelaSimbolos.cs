@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Compiladores
+namespace TrabalhoPratico_entrega2
 {
     public class TabelaSimbolos
     {

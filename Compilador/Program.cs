@@ -1,6 +1,10 @@
-using System;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace Compiladores
+namespace TrabalhoPratico_entrega2
 {
     public class Program
     {
@@ -13,7 +17,7 @@ namespace Compiladores
             sintatico.prog();
             sintatico.fecharArquivo();
 
-           // lexico.imprimeTabelaSimbolos();
+            // lexico.imprimeTabelaSimbolos();
             #region Versão 01
             //Token token;
             //TabelaSimbolos tabelaSimbolos = new TabelaSimbolos();

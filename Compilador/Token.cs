@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Compiladores
+namespace TrabalhoPratico_entrega2
 {
     public class Token
     {
