@@ -1,53 +1,50 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Text;
 
-namespace TrabalhoPratico_entrega2
+namespace Compilador
 {
-    public class AnalisadorLex
+    public class AnalisadorLexico
     {
         #region Variaveis
+
         private static readonly int END_OF_FILE = -1;
         private static int lookahead = 0;
-        public static int nLinhas = 1;
-        public static int nColunas = 1;
+        private static int linha = 1;
+        private static int coluna = 0;
         private FileStream arquivo;
         private TabelaSimbolos tabelaSimbolos;
 
         #endregion
 
-        #region Leitura de Arquivo
-        public AnalisadorLex(String arquivoEntrada)
+        #region Manipulação de Arquivo
+        //Abre arquivo
+        public AnalisadorLexico(string arquivoEntrada)
         {
-            tabelaSimbolos = new TabelaSimbolos(nLinhas, nColunas);
             try
             {
-                arquivo = new FileStream("C:\\Users\\stell\\Documents\\Arquivos\\teste.txt", FileMode.Open);
+                arquivo = new FileStream("C:\\Users\\stella.moreira\\Downloads\\PrimeiroCerto.txt", FileMode.Open);
             }
-            catch (IOException excep)
+            catch (IOException exception)
             {
-                Console.WriteLine("Erro de abertura do arquivo " + arquivoEntrada + "\nException: " + excep);
+                Console.WriteLine("\t Erro na abertura de Arquivo " + exception);
                 Environment.Exit(1);
+                Console.WriteLine("\t Pressione enter para sair do programa. ");
                 Console.ReadLine();
             }
-            catch (Exception excep)
+            catch (Exception exception)
             {
-                Console.WriteLine("Erro do programa ou falha da tabela de símbolos \nException: " + excep);
+                Console.WriteLine("\t Erro do programa ou falha na tabela de símbolos " + exception);
                 Environment.Exit(2);
+                Console.WriteLine("\t Pressione enter para sair do programa. ");
+                Console.ReadLine();
             }
-        }
-        #endregion
 
-        public void imprimeTabelaSimbolos()
-        {
-            Console.WriteLine("\n");
-            Console.WriteLine("\t\t    Tabela de Simbolos: \n\n");
-            Console.WriteLine(tabelaSimbolos.ToString());
-            Console.WriteLine("\n");
+            tabelaSimbolos = new TabelaSimbolos();
         }
 
-        #region Fechar Arquivo
-        public void fechaArquivo()
+        //Fecha Arquivo
+        public void fecharArquivo()
         {
             try
             {
@@ -55,59 +52,56 @@ namespace TrabalhoPratico_entrega2
             }
             catch (IOException errorFile)
             {
-                Console.WriteLine("Erro ao fechar o arquivo \nException: " + errorFile);
+                Console.WriteLine("\t Erro ao fechar o arquivo: " + errorFile);
                 Environment.Exit(3);
+                Console.WriteLine("\t Pressione enter para sair do programa. ");
                 Console.ReadLine();
             }
         }
         #endregion
 
-        #region Sinaliza Erro Léxico
-        public void sinalizaErro(String mensagem)
-        {
-            Console.WriteLine("\n\tErro Lexico: " + mensagem + "\n");
-            fechaArquivo();
-            Console.WriteLine("\n\n\t\tArquivo Finalizado");
-            Console.ReadLine();
-        }
-        #endregion
 
-        #region Retorna uma posição
+        public void imprimeTabelaSimbolos()
+        {
+            Console.Write("\n\t\t    Tabela de Símbolos: \n\n");
+            Console.WriteLine(tabelaSimbolos.ToString() + "\n");
+        }
+
+        public void sinalizaErro(string mensagem)
+        {
+            Console.WriteLine("\n\t\t    [Erro Lexico]: " + mensagem + "\n");
+
+        }
+
         public void retornaPonteiro()
         {
             try
             {
                 if (lookahead != END_OF_FILE)
                 {
-                    //arquivo.Seek(arquivo.Position - 1, SeekOrigin.Current);
                     arquivo.Position--;
-
+                    coluna -= 1;
                 }
             }
-            catch (IOException excep)
+            catch (IOException exception)
             {
-                Console.WriteLine("Falha ao retornar a Leitura \nException: " + excep);
-                Environment.Exit(3);
+                Console.WriteLine("\n\t\t    Falha ao retornar a leitura: " + exception);
+                Environment.Exit(4);
+                Console.WriteLine("\t Pressione enter para sair do programa. ");
                 Console.ReadLine();
             }
         }
-        #endregion
 
-        #region Percorre os Tokens
         public Token proximoToken()
         {
-            #region Variaveis do Método
             var lexema = new StringBuilder();
-            int estado = 1;
+            int estado = 0;
             char caracter;
-            #endregion
 
-            #region Percorrendo o Arquivo
-            for (var i = 0; i <= arquivo.Length; i++)
+            while (true)
             {
-                caracter = '\u0000'; //Caracter Null
+                caracter = '\u0000';
 
-                //Avança
                 try
                 {
                     lookahead = arquivo.ReadByte();
@@ -115,350 +109,257 @@ namespace TrabalhoPratico_entrega2
                     {
                         caracter = (char)lookahead;
                     }
+                    coluna += 1;
                 }
-                catch (IOException excep)
+                catch (IOException exception)
                 {
-                    Console.WriteLine("Erro na leitura do arquivo");
+                    Console.WriteLine("\t Erro na leitra de Arquivo " + exception);
                     Environment.Exit(3);
+                    Console.WriteLine("\t Pressione enter para sair do programa. ");
                     Console.ReadLine();
                 }
-                #endregion
 
+                #region Analise de estado e modificações do automato
                 switch (estado)
                 {
-                    #region Case 1
-                    case 1:
+                    case 0:
                         if (lookahead == END_OF_FILE)
-                            return new Token(EnumTab.EOF, "EOF", nLinhas, nColunas);
-                        else if (caracter == ' ' || caracter == '\t' || caracter == '\n' || caracter == '\r')
+                            return new Token(EnumTab.EOF, "EOF", linha, coluna);
+                        else if (caracter == ' ')
                         {
-                            switch (caracter)
-                            {
-                                case ' ':
-                                    nColunas += 1;
-                                    break;
-                                case '\t':
-                                    nColunas += 3;
-                                    break;
-                                case '\n':
-                                    nLinhas += 1;
-                                    nColunas = 1;
-                                    break;
-                                case '\r':
-                                    nColunas += 1;
-                                    break;
-                            }
+
                         }
-                        //Verificação de letra unicode 
-                        else if (Char.IsLetter(caracter))
+                        else if (caracter == '\r')
                         {
-                            //Acrescenta uma cópia da cadeia de caracteres especificada a essa instância.
-                            lexema.Append(caracter);
-                            estado = 14; // Redireciona no case de teste == ( _ )
+                            coluna = 0;
                         }
-                        //Verificação de numero unicode 
-                        else if (Char.IsDigit(caracter))
+                        else if (caracter == '\n')
                         {
-                            //Acrescenta uma cópia da cadeia de caracteres especificada a essa instância.
-                            lexema.Append(caracter);
-                            estado = 12; // Redireciona no case de teste == ( . )
+                            linha += 1;
+                            coluna = 0;
                         }
-                        else if (caracter == '<')
+                        else if (caracter == '\t')
                         {
-                            estado = 6;
-                        }
-                        else if (caracter == '>')
-                        {
-                            estado = 9;
+                            coluna += 2;
                         }
                         else if (caracter == '=')
                         {
-                            estado = 2;
+                            estado = 1;
                         }
                         else if (caracter == '!')
                         {
+                            estado = 2;
+                        }
+                        else if (caracter == '>')
+                        {
+                            estado = 3;
+                        }
+                        else if (caracter == '<')
+                        {
                             estado = 4;
-                        }
-                        else if (caracter == '/')
-                        {
-                            estado = 16;
-                        }
-                        else if (caracter == '*')
-                        {
-                            estado = 18;
-                            return new Token(EnumTab.OP_MUL, "*", nLinhas, nColunas);
                         }
                         else if (caracter == '+')
                         {
-                            estado = 19;
-                            return new Token(EnumTab.OP_AD, "+", nLinhas, nColunas);
+                            estado = 5;
+                            return new Token(EnumTab.OP_AD, "+", linha, coluna);
                         }
                         else if (caracter == '-')
                         {
-                            estado = 20;
-                            return new Token(EnumTab.OP_MIN, "-", nLinhas, nColunas);
+                            estado = 6;
+                            return new Token(EnumTab.OP_MIN, "-", linha, coluna);
                         }
-                        else if (caracter == ';')
+                        else if (caracter == '*')
                         {
-                            estado = 21;
-                            return new Token(EnumTab.SMB_SEM, ";", nLinhas, nColunas);
+                            estado = 7;
+                            return new Token(EnumTab.OP_MUL, "*", linha, coluna);
                         }
-                        else if (caracter == ',')
+                        else if (caracter == '/')
                         {
-                            estado = 30;
-                            return new Token(EnumTab.SMB_COM, ",", nLinhas, nColunas);
+                            estado = 25;
                         }
-                        else if (caracter == '(')
+                        else if (Char.IsDigit(caracter))
                         {
-                            estado = 22;
-                            return new Token(EnumTab.SMB_OPA, "(", nLinhas, nColunas);
+                            estado = 9;
+                            lexema.Append(caracter);
                         }
-                        else if (caracter == ')')
+                        else if (Char.IsLetter(caracter))
                         {
-                            estado = 23;
-                            return new Token(EnumTab.SMB_CPA, ")", nLinhas, nColunas);
+                            estado = 10;
+                            lexema.Append(caracter);
                         }
                         else if (caracter == '{')
                         {
-                            estado = 24;
-                            return new Token(EnumTab.SMB_OBC, "{", nLinhas, nColunas);
+                            estado = 11;
+                            return new Token(EnumTab.SMB_OBC, "{", linha, coluna);
                         }
                         else if (caracter == '}')
                         {
-                            estado = 25;
-                            return new Token(EnumTab.SMB_CBC, "}", nLinhas, nColunas);
+                            estado = 12;
+                            return new Token(EnumTab.SMB_CBC, "}", linha, coluna);
+                        }
+                        else if (caracter == '(')
+                        {
+                            estado = 13;
+                            return new Token(EnumTab.SMB_OPA, "(", linha, coluna);
+                        }
+                        else if (caracter == ')')
+                        {
+                            estado = 14;
+                            return new Token(EnumTab.SMB_CPA, ")", linha, coluna);
+                        }
+                        else if (caracter == ',')
+                        {
+                            estado = 15;
+                            return new Token(EnumTab.SMB_COM, ",", linha, coluna);
+                        }
+                        else if (caracter == ';')
+                        {
+                            estado = 16;
+                            return new Token(EnumTab.SMB_SEM, ";", linha, coluna);
+                        }
+                        else if (caracter == (char)39)
+                        {
+                            estado = 22;
                         }
                         else if (caracter == '"')
                         {
-                            estado = 26;
+                            estado = 23;
                         }
                         else
                         {
-                            sinalizaErro("\n-------------------------\nErro: Caracter ínvalido " + caracter + " cuja linha é: " + nLinhas + " e a coluna é: " + nColunas);
+                            sinalizaErro("\n\t\t    Caracter inválido: " + caracter +
+                                                    " linha: " + linha + " coluna: " + coluna);
+                            return null;
                         }
                         break;
-                    #endregion
 
-                    #region Case 2
+                    case 1:
+                        if (caracter == '=')
+                        {
+                            estado = 17;
+                            return new Token(EnumTab.OP_EQ, "==", linha, coluna);
+                        }
+                        else
+                        {
+                            retornaPonteiro();
+                            return new Token(EnumTab.OP_ASS, "=", linha, coluna);
+                        }
                     case 2:
+                        if (coluna == '=')
+                        {
+                            estado = 18;
+                            return new Token(EnumTab.OP_NE, "!=", linha, coluna);
+                        }
+                        else
+                        {
+                            sinalizaErro("\n\t\t    Caracter inválido [! ou =] indisponíveis: " +
+                                                    "\n\t\t\t    Linha: " + linha + " coluna: " + coluna);
+                            return null;
+                        }
+                    case 3:
                         if (caracter == '=')
                         {
-                            estado = 3;
-                            return new Token(EnumTab.OP_EQ, "==", nLinhas, nColunas);
+                            estado = 19;
+                            return new Token(EnumTab.OP_GE, ">=", linha, coluna);
                         }
                         else
                         {
                             retornaPonteiro();
-                            return new Token(EnumTab.OP_ASS, "=", nLinhas, nColunas);
+                            return new Token(EnumTab.OP_GT, ">", linha, coluna);
                         }
-                    #endregion
-
-                    #region Case 4
                     case 4:
-                        if (caracter == '=')
+                        if (coluna == '=')
                         {
-                            estado = 5;
-                            return new Token(EnumTab.OP_NE, "!=", nLinhas, nColunas);
+                            estado = 20;
+                            return new Token(EnumTab.OP_LE, "<=", linha, coluna);
                         }
                         else
                         {
                             retornaPonteiro();
-                            sinalizaErro("\n-------------------------\nErro: Token incompleto para o caracter: " + caracter + " cuja linha é: " + nLinhas + " e a coluna é: " + nColunas);
+                            return new Token(EnumTab.OP_LT, "<", linha, coluna);
                         }
-                        break;
-                    #endregion
-
-                    #region Case 6
-                    case 6:
-                        if (caracter == '=')
-                        {
-                            estado = 7;
-                            return new Token(EnumTab.OP_LE, "<=", nLinhas, nColunas);
-                        }
-                        else
-                        {
-                            estado = 8;
-                            retornaPonteiro();
-                            return new Token(EnumTab.OP_LT, "<", nLinhas, nColunas);
-                        }
-                    #endregion
-
-                    #region Case 9
                     case 9:
-                        if (caracter == '=')
-                        {
-                            estado = 10;
-                            return new Token(EnumTab.OP_GE, ">=", nLinhas, nColunas);
-                        }
-                        else
-                        {
-                            estado = 11;
-                            retornaPonteiro();
-                            return new Token(EnumTab.OP_GT, ">", nLinhas, nColunas);
-                        }
-                    #endregion
-
-                    #region Case 12
-                    case 12:
                         if (Char.IsDigit(caracter))
                         {
+                            estado = 9;
                             lexema.Append(caracter);
                         }
                         else if (caracter == '.')
                         {
                             lexema.Append(caracter);
-                            estado = 26;
+                            estado = 21;
                         }
                         else
                         {
-                            estado = 13;
                             retornaPonteiro();
-                            return new Token(EnumTab.NUM_CONST, lexema.ToString(), nLinhas, nColunas);
+                            return new Token(EnumTab.CON_NUM, lexema.ToString(), linha, coluna);
                         }
                         break;
-                    #endregion
-
-                    #region Case 14
-                    case 14:
+                    case 10:
                         if (Char.IsLetterOrDigit(caracter) || caracter == '_')
                         {
+                            estado = 10;
                             lexema.Append(caracter);
                         }
                         else
                         {
-                            estado = 15;
                             retornaPonteiro();
-                            Token token = tabelaSimbolos.retornaToken(lexema.ToString(), nLinhas, nColunas);
+                            tabelaSimbolos.ToString();
+                            Token token = tabelaSimbolos.retornaToken(lexema.ToString());
 
                             if (token == null)
                             {
-                                return new Token(EnumTab.ID, lexema.ToString(), nLinhas, nColunas);
+                                Token novoToken = new Token(EnumTab.ID, lexema.ToString(), linha, coluna);
+                                tabelaSimbolos.insereIdentificador(novoToken, new InfIdentificador());
+                                return novoToken;
                             }
                             return token;
                         }
                         break;
-                    #endregion
-
-                    #region Case 16
-                    case 16:
-                        if (caracter == '/')
+                    case 21:
+                        if (Char.IsDigit(caracter))
                         {
-                            estado = 17;
-                        }
-                        else if (caracter == '*')
-                        {
-                            estado = 18;
-                        }
-                        else if (lookahead == END_OF_FILE)
-                        {
-                            sinalizaErro("\n-------------------------\nErro: Comentário deve ser fechada com */ antes do fim de arquivo");
+                            lexema.Append(caracter);
+                            estado = 24;
                         }
                         else
                         {
-                            retornaPonteiro();
-                            return new Token(EnumTab.OP_DIV, "/", nLinhas, nColunas);
-                        }
-                        break;
-                    #endregion
-
-                    #region Case 17
-                    case 17:
-                        estado = 30;
-                        break;
-                    #endregion
-
-                    #region Case 18
-                    case 18:
-                        estado = 31;
-                        break;
-                    #endregion
-
-                    #region Case 21
-                    case 21:
-                        if (caracter == '\n' || lookahead == END_OF_FILE)
-                        {
+                            sinalizaErro("\n\t\t    Padrão para número inválido: " + caracter +
+                                                    " linha: " + linha + " coluna: " + coluna);
                             return null;
                         }
                         break;
-                    #endregion
-
-                    #region Case 22
                     case 22:
-                        if (lookahead == END_OF_FILE)
+                        if (caracter == (char)39)
                         {
-                            sinalizaErro("\n-------------------------\nErro: String deve ser fechada com ) antes do fim de arquivo");
+                            return new Token(EnumTab.CON_CHAR, lexema.ToString(), linha, coluna);
+                        }
+                        else if (lookahead == END_OF_FILE)
+                        {
+                            sinalizaErro("\n\t\t    Conjunto de char deve ser fechado com ' antes do fim de arquivo");
+                            return null;
                         }
                         else
                         {
                             lexema.Append(caracter);
                         }
                         break;
-                    #endregion
-
-                    #region Case 24
-                    case 24:
-                        if (lookahead == END_OF_FILE)
-                        {
-                            sinalizaErro("\n-------------------------\nErro: String deve ser fechada com } antes do fim de arquivo");
-                        }
-                        else
-                        {
-                            lexema.Append(caracter);
-                        }
-                        break;
-                    #endregion
-
-                    #region Case 26
-                    case 26:
-                        if (caracter == '\0' || lookahead == END_OF_FILE || caracter == '\n')
-                        {
-                            sinalizaErro("\n");
-                        }
-                        else if (caracter == '"')
-                        {
-                            return new Token(EnumTab.STRING, lexema.ToString(), nLinhas, nColunas);
-                        }
-                        else
-                        {
-                            lexema.Append(caracter);
-                        }
-                        break;
-                    #endregion
-
-                    #region Case 27
-                    case 27:
+                    case 23:
                         if (caracter == '"')
                         {
-                            estado = 27;
-                            return null;
+                            return new Token(EnumTab.LIT, lexema.ToString(), linha, coluna);
                         }
                         else if (lookahead == END_OF_FILE)
                         {
-                            sinalizaErro("\n-------------------------\nErro: String deve ser fechada antes do fim do arquivo");
+                            sinalizaErro("\n\t\t    String deve ser fechada com \" antes do fim de arquivo");
+                            return null;
                         }
                         else
                         {
                             lexema.Append(caracter);
                         }
                         break;
-                    #endregion
-
-                    #region Case 28
-                    case 28:
-                        if (Char.IsDigit(caracter))
-                        {
-                            lexema.Append(caracter);
-                            estado = 27;
-                        }
-                        else
-                        {
-                            sinalizaErro("\n-------------------------\nErro: Padrão DOUBLE inválido na linha: " + nLinhas + " e na coluna: " + nColunas);
-                        }
-                        break;
-                    #endregion
-
-                    #region Case 29
-                    case 29:
+                    case 24:
                         if (Char.IsDigit(caracter))
                         {
                             lexema.Append(caracter);
@@ -466,83 +367,73 @@ namespace TrabalhoPratico_entrega2
                         else
                         {
                             retornaPonteiro();
-                            return new Token(EnumTab.NUM_CONST, lexema.ToString(), nLinhas, nColunas);
+                            return new Token(EnumTab.CON_NUM, lexema.ToString(), linha, coluna);
                         }
                         break;
-                    #endregion
-
-                    #region Case 30
-                    case 30:
-                        if (caracter == '\n' || lookahead == END_OF_FILE )
-                        {
-                            return new Token(EnumTab.COMENTARIO, caracter.ToString(), nLinhas, nColunas);
-                        }
-                        break;
-                    #endregion
-
-                    #region Case 31
-                    case 31:
-                        if (caracter == '\0' || lookahead == END_OF_FILE)
-                        {
-                            sinalizaErro("\n-------------------------\nErro: String deve ser fechada com */ antes do fim de arquivo");
-                        }
+                    case 25:
                         if (caracter == '*')
                         {
-                            estado = 34;
+                            estado = 26;
+                        }
+                        else if (caracter == '/')
+                        {
+                            estado = 27;
                         }
                         else
                         {
-                            estado = 33;
+                            retornaPonteiro();
+                            return new Token(EnumTab.OP_DIV, "/", linha, coluna);
                         }
                         break;
-                    #endregion
-
-                    #region Case 32
-                    case 32:
-                        if (caracter == '/')
-                        {
-                            break;
-                        }
-                        else if (caracter == '\n' || lookahead == END_OF_FILE)
-                        {
-                            sinalizaErro("\n-------------------------\nErro: Comentário deve ser fechada com */ antes do fim de arquivo");
-                        }
-                        break;
-                    #endregion
-
-                    #region Case 33
-                    case 33:
+                    case 26:
                         if (caracter == '*')
                         {
-                            estado = 34;
+                            estado = 28;
                         }
-                        else if (caracter == '\0' || lookahead == END_OF_FILE || caracter == '/')
+                        else if (lookahead == END_OF_FILE)
                         {
-                            sinalizaErro("\n-------------------------\nErro: Comentário deve ser fechada com */ antes do fim de arquivo");
+                            sinalizaErro("\n\t\t    Comentário deve ser fechado antes do fim do arquivo com */");
+                            estado = 0;
+                            coluna = 0;
+                            linha += 1;
                         }
-                        else if (caracter == '\n' || caracter == '\r')
+                        else
                         {
-                            estado = 33;
+                            estado = 26;
                         }
                         break;
-                    #endregion
-
-                    #region Case 34
-                    case 34:
+                    case 27:
+                        if (caracter == '\n')
+                        {
+                            estado = 0;
+                            coluna = 0;
+                            linha += 1;
+                        }
+                        else
+                        {
+                            estado = 27;
+                        }
+                        break;
+                    case 28:
                         if (caracter == '/')
                         {
-                            return null;
+                            estado = 0;
                         }
-                        else if (caracter == '\0' || lookahead == END_OF_FILE)
+                        else if (lookahead == END_OF_FILE)
                         {
-                            sinalizaErro("\n-------------------------\nErro: Comentário deve ser fechada com */ antes do fim de arquivo");
+                            sinalizaErro("\n\t\t    Comentário deve ser fechado antes do fim do arquivo com */ ");
+                            estado = 0;
+                            coluna = 0;
+                            linha += 1;
+                        }
+                        else
+                        {
+                            estado = 26;
                         }
                         break;
-                        #endregion
                 }
             }
-            return null;
+            #endregion
         }
-        #endregion
     }
 }
