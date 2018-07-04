@@ -1,78 +1,31 @@
-﻿using System;
-
-namespace TrabalhoPratico_entrega2
+namespace Compilador
 {
     public class Token
     {
         #region Variaveis
-        private string lexema;
-        private EnumTab classe;
-        public int nLinha;
-        public int nColuna;
+
+        public string lexema { get; set; }
+        public EnumTab classe { get; set; }
+        public int linha { get; set; }
+        public int coluna { get; set; }
+        
         #endregion
 
         #region Construtor
-        public Token(EnumTab classe, String lexema, int linha, int Coluna)
+        public Token (EnumTab classe, string lexema, int linha, int coluna)
         {
             this.classe = classe;
             this.lexema = lexema;
-            this.nLinha = linha;
-            this.nColuna = Coluna;
+            this.linha = linha;
+            this.coluna = coluna;
         }
-        #endregion
-
-        #region Métodos Get/Set
-        public String getLexema()
-        {
-
-            return lexema;
-        }
-
-        public void setLexema(String lexema)
-        {
-
-            this.lexema = lexema;
-        }
-        public EnumTab getClasse()
-        {
-            return classe;
-        }
-
-        public void setClasse(EnumTab classe)
-        {
-
-            this.classe = classe;
-        }
-
-        public int getLinha()
-        {
-            return nLinha;
-        }
-
-        public void setLinha(int linha)
-        {
-            this.nLinha = linha;
-        }
-
-        public int getColuna()
-        {
-            return nColuna;
-        }
-
-        public void setColuna(int coluna)
-        {
-            this.nColuna = coluna;
-        }
+        
         #endregion
 
         public override string ToString()
         {
-            return "<" + classe + " , \"" + lexema + " \">";
+            return "< " + classe + " - " + lexema + " > \n\t\t     Linha: " + linha + " Coluna: " + coluna + "\n";
         }
 
-        public string LinhaPercorrida()
-        {
-            return "\tLinha: " + getLinha() + " Coluna: " + getColuna();
-        }
     }
 }
