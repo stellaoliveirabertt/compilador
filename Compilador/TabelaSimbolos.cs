@@ -1,18 +1,20 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
-namespace TrabalhoPratico_entrega2
+namespace Compilador
 {
     public class TabelaSimbolos
     {
-        private Dictionary<Token, InfIdentificador> tabelaSimbolos;
+        private int linha;
+        private int coluna;
+        Dictionary<Token, InfIdentificador> tabelaSimbolos;
 
-        public TabelaSimbolos(int linha, int coluna)
+        public TabelaSimbolos()
         {
             tabelaSimbolos = new Dictionary<Token, InfIdentificador>();
 
-            #region Palavras reservadas
-            Token palavra;
+            #region Palavras Reservadas
 
+            Token palavra;
             palavra = new Token(EnumTab.KW_PROGRAM, "program", linha, coluna);
             tabelaSimbolos[palavra] = new InfIdentificador();
 
@@ -45,53 +47,48 @@ namespace TrabalhoPratico_entrega2
 
             palavra = new Token(EnumTab.KW_AND, "and", linha, coluna);
             tabelaSimbolos[palavra] = new InfIdentificador();
-            #endregion
-        }
-
-        #region Insere o identificador
-        public void insereIdentificador(Token palavra, InfIdentificador ident)
-        {
-            tabelaSimbolos.Add(palavra, ident);
+            
         }
         #endregion
 
-        #region Retorna o Identificador
+        //Insere o identificador
+        public void insereIdentificador(Token palavra, InfIdentificador identificador)
+        {
+            tabelaSimbolos.Add(palavra, identificador);
+        }
+
+        //Retorna um identificfador de um determinado token
         public InfIdentificador obtemIdentificador(Token palavra)
         {
             InfIdentificador infoIdentificador = tabelaSimbolos[palavra];
             return infoIdentificador;
         }
-        #endregion
 
-        #region Verifica Identificadores e Palavra reservada
-        public Token retornaToken(string lexema, int linha, int coluna)
+        //Pesquisa a existencia do lexema
+        public Token retornaToken(string lexema)
         {
             foreach (Token token in tabelaSimbolos.Keys)
             {
-                if (token.getLexema().Equals(lexema))
+                if (token.lexema.Equals(lexema))
                 {
-                    token.nLinha = linha;
-                    token.nColuna = coluna;
                     return token;
                 }
             }
             return null;
         }
-        #endregion
 
-        #region Encontra Token - Retorna
         public override string ToString()
         {
-            string mensagemSaida = " ";
+            
+            string saida = " ";
 
             foreach (Token token in tabelaSimbolos.Keys)
             {
-                mensagemSaida += (("\t " + token.ToString()) + "\n");
+
+                saida += ("\t " + token.ToString()) + "\n\t\t Linha: " + linha + " Coluna: " + coluna + "\n";
             }
 
-            return mensagemSaida;
+            return saida;
         }
-        #endregion
-
     }
 }
