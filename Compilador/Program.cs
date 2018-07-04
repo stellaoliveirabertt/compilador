@@ -1,41 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System;
 
-namespace TrabalhoPratico_entrega2
+namespace Compilador
 {
     public class Program
     {
         public static void Main(string[] args)
         {
-            AnalisadorLex lexico = new AnalisadorLex("teste.txt");
-            AnalisadorSint sintatico = new AnalisadorSint(lexico);
+            AnalisadorLexico lexo = new AnalisadorLexico("PrimeiroCerto.txt");
+            AnalisadorSintatico sintatico = new AnalisadorSintatico(lexo);
 
-            //Inicia o processo
-            sintatico.prog();
+            sintatico.Prog();
             sintatico.fecharArquivo();
-
-            // lexico.imprimeTabelaSimbolos();
-            #region Versão 01
-            //Token token;
-            //TabelaSimbolos tabelaSimbolos = new TabelaSimbolos();
-
-            //do
-            //{
-            //    token = lexer.proximoToken();
-
-            //    if (token != null)
-            //    {
-            //        Console.WriteLine("-------------------------\n" +
-            //                           "Token: " + token.ToString());
-            //    }
-            //} while (lookahead != END_OF_FILE);
-            //lexer.fechaArquivo();
-            #endregion
-
-            Console.WriteLine("\n\n\t\tArquivo Finalizado");
+            lexo.imprimeTabelaSimbolos();
+            Console.WriteLine("Programa compilado !");
             Console.ReadLine();
         }
     }
