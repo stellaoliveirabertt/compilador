@@ -1,4 +1,4 @@
-﻿namespace TrabalhoPratico_entrega2
+namespace Compilador
 {
     public enum EnumTab
     {
@@ -37,27 +37,26 @@
         KW_WRITE,
         KW_READ,
         KW_NUM,
-        KW_CHAR,
         KW_NOT,
+        KW_CHAR,
         KW_OR,
         KW_AND,
+        KW_END,
         #endregion
 
         #region Identificadores
         ID,
         #endregion
 
+        #region Literal
+        LIT,
+        #endregion
+
         #region Constantes
         NUM_CONST,
+        CON_NUM,
+        CON_CHAR,
         #endregion
 
-        #region Constantes
-        CHAR_CONST,
-        COMENTARIO,
-        #endregion
-
-        #region String
-        STRING
-        #endregion
     }
 }
